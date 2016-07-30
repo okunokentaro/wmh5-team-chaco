@@ -2,13 +2,14 @@ import {Component, Inject} from '@angular/core';
 import * as lodash from "lodash";
 
 import {FrameService} from './frame.service';
+import {MidiAdaputer} from './midiAdaputer';
 
 const DEFAULT_BPM = 120;
 
 @Component({
   selector  : 'wm-app',
   directives: [],
-  providers : [FrameService],
+  providers : [FrameService, MidiAdaputer],
   template  : `
     <style>
       :host {
@@ -47,8 +48,11 @@ const DEFAULT_BPM = 120;
   `
 })
 export class AppComponent {
-  constructor(@Inject(FrameService) frame) {
+  constructor(@Inject(FrameService) frame,
+              @Inject(MidiAdaputer) midiAdapter) {
     this.frame = frame;
+    this.midiAdapter = midiAdapter;
+
     this.range = 16;
     this.grids = lodash.range(this.range).map((i) => {
       return {
@@ -88,6 +92,10 @@ export class AppComponent {
     this.frame.run(this.bpm);
     this.disposable = this.frame.observable.subscribe((f) => {
       this.f = f;
+      const current = this.f % this.grids.length;
+      if (this.grids[current].note) {
+        this.midiAdapter.emit(current);
+      }
     });
   }
 
