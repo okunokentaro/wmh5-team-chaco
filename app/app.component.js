@@ -27,14 +27,22 @@ const DEFAULT_BPM = 120;
         margin-right: 8px;
         background: #550;
       }
+      .on {
+        background: #ff0;
+      }
     </style>
     <h1>{{f}}</h1>
     <ul class="grids">
-      <li class="grid" *ngFor="let i of grids"></li>
+      <li
+        *ngFor="let grid of grids; let idx = index"
+        class="grid"
+        [class.on]="grid.note"
+        (click)="onClickGrid($event, idx)"
+      ></li>
     </ul>
     <input type="range" [ngModel]="bpm" (ngModelChange)="onBpmChange($event)" name="bpm" min="40" max="200">
     <button (click)="contract()">-</button>
-  <button (click)="expand()">+</button>
+    <button (click)="expand()">+</button>
     {{bpm}}
   `
 })
@@ -42,7 +50,11 @@ export class AppComponent {
   constructor(@Inject(FrameService) frame) {
     this.frame = frame;
     this.range = 16;
-    this.grids = lodash.range(this.range);
+    this.grids = lodash.range(this.range).map((i) => {
+      return {
+        note: false
+      }
+    });
   }
 
   ngOnInit() {
@@ -77,5 +89,10 @@ export class AppComponent {
     this.disposable = this.frame.observable.subscribe((f) => {
       this.f = f;
     });
+  }
+
+  onClickGrid(ev, idx) {
+    console.log(`onClickGrid`, idx);
+    this.grids[idx].note = !this.grids[idx].note;
   }
 }
