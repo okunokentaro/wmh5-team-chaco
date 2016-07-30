@@ -3,12 +3,12 @@ import MIDI from './module/MIDI';
 import Rx from 'rxjs/Rx';
 
 @Injectable()
-class MidiAdaputer {
-  constructor {
-    this.midi = new MIDI();
+export class MidiAdaputer {
+  constructor() {
+    
     this.subject = new Rx.Subject();
     this.subject.subscribe((v) => {
-
+      console.log(v);
     });
   }
 
@@ -17,5 +17,3 @@ class MidiAdaputer {
   }
 
 }
-
-export class MidiAdaputer;
