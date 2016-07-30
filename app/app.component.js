@@ -114,6 +114,10 @@ export class AppComponent {
     window.firebaseApp.database().ref('grids1').on('value', (dataSnapshot) => {
       this.grids1 = dataSnapshot.child('/').val();
     });
+
+    window.firebaseApp.database().ref('grids1').on('value', (dataSnapshot) => {
+      this.grids1 = dataSnapshot.child('/').val();
+    });
     window.firebaseApp.database().ref('grids2').on('value', (dataSnapshot) => {
       this.grids2 = dataSnapshot.child('/').val();
     });
@@ -123,7 +127,6 @@ export class AppComponent {
     window.firebaseApp.database().ref('grids4').on('value', (dataSnapshot) => {
       this.grids4 = dataSnapshot.child('/').val();
     });
-
     setTimeout(() => {
       this.run(DEFAULT_BPM);
     }, 2000);
