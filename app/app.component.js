@@ -6,6 +6,7 @@ import {FrameService} from './frame.service';
 import {MidiAdaputer} from './midiAdaputer';
 
 const DEFAULT_BPM = 128;
+const MAX_CHANNEL = 6;
 
 @Component({
   selector  : 'wm-app',
@@ -14,11 +15,16 @@ const DEFAULT_BPM = 128;
   template  : `
     <style>
       :host {
-        display: block;
+        display: flex;
         width: 100vw;
         height: 100vh;
         background-color: #222;
         color: #ffff00;
+        justify-content: center;
+        align-items: center;
+      }
+      #container {
+        
       }
       .grids {
         display: flex;
@@ -34,32 +40,38 @@ const DEFAULT_BPM = 128;
       .g0 li {background: #0a4b3e;}
       .g1 li {background: #12512d;}
       .g2 li {background: #14405c;}
-      .g3 li {background: #19244a;}
-      .g4 li {background: #492359;}
-      .g5 li {background: #6e4708;}
-      .g6 li {background: #7c3100;}
-      .g7 li {background: #661e17;}
+      .g3 li {background: #492359;}
+      .g4 li {background: #6e4708;}
+      .g5 li {background: #661e17;}
 
       .g0 li.on {background: #1abc9c;}
       .g1 li.on {background: #2ecc71;}
       .g2 li.on {background: #3498db;}
-      .g3 li.on {background: #4763c1;}
-      .g4 li.on {background: #9b59b6;}
-      .g5 li.on {background: #f1c40f;}
-      .g6 li.on {background: #e67e22;}
-      .g7 li.on {background: #e74c3c;}
+      .g3 li.on {background: #9b59b6;}
+      .g4 li.on {background: #f1c40f;}
+      .g5 li.on {background: #e74c3c;}
+      
+      .g0 li.on.active { box-shadow: 0 0 20px rgba(209, 255, 200, 0.9); }
+      .g1 li.on.active { box-shadow: 0 0 20px rgba(192, 255, 182, 0.9); }
+      .g2 li.on.active { box-shadow: 0 0 20px rgba(193, 234, 255, 0.9); }
+      .g3 li.on.active { box-shadow: 0 0 20px rgba(241, 218, 255, 0.9); }
+      .g4 li.on.active { box-shadow: 0 0 20px rgba(255, 228, 158, 0.9); }
+      .g5 li.on.active { box-shadow: 0 0 20px rgba(255, 205, 215, 0.9); }
     </style>
-    <ul
-      *ngFor="let key of keys"
-      class="grids g{{key}}"
-    >
-      <li
-        *ngFor="let grid of gridSet[key]; let idx = index"
-        class="grid"
-        [class.on]="grid.note"
-        (click)="onClickGrid(key, $event, idx)"
-      ></li>
-    </ul>
+    <div id="container">
+      <ul
+        *ngFor="let key of keys"
+        class="grids g{{key}}"
+      >
+        <li
+          *ngFor="let grid of gridSet[key]; let idx = index"
+          class="grid"
+          [class.on]="grid.note"
+          [class.active]="idx === current"
+          (click)="onClickGrid(key, $event, idx)"
+        ></li>
+      </ul>
+    </div>
     
   `
 })
@@ -72,7 +84,7 @@ export class AppComponent {
     this.range = 16;
 
     this.gridSet = {};
-    lodash.range(8).forEach((i) => {
+    lodash.range(MAX_CHANNEL).forEach((i) => {
       this.gridSet[i] = lodash.range(this.range).map(() => {
         return {note: false, bpm: DEFAULT_BPM};
       });
@@ -123,6 +135,7 @@ export class AppComponent {
 
         let data = {};
 
+        this.current = this.f % this.gridSet[0].length;
         const func = (i) => {
           const current = this.f % this.gridSet[i].length;
           if (this.gridSet[i][current].note) {
