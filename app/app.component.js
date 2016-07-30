@@ -30,66 +30,37 @@ const DEFAULT_BPM = 128;
         margin-right: 8px;
         background: #550;
       }
-      .g1 li {
-        background: #550;
-      }
-      .g2 li {
-        background: #505;
-      }
-      .g3 li {
-        background: #055;
-      }
-      .g4 li {
-        background: #500;
-      }
-      .g1 li.on {
-        background: #ff0;
-      }
-      .g2 li.on {
-        background: #f0f;
-      }
-      .g3 li.on {
-        background: #0ff;
-      }
-      .g4 li.on {
-        background: #a00;
-      }
+      
+      .g0 li {background: #0a4b3e;}
+      .g1 li {background: #12512d;}
+      .g2 li {background: #14405c;}
+      .g3 li {background: #19244a;}
+      .g4 li {background: #492359;}
+      .g5 li {background: #6e4708;}
+      .g6 li {background: #7c3100;}
+      .g7 li {background: #661e17;}
+
+      .g0 li.on {background: #1abc9c;}
+      .g1 li.on {background: #2ecc71;}
+      .g2 li.on {background: #3498db;}
+      .g3 li.on {background: #4763c1;}
+      .g4 li.on {background: #9b59b6;}
+      .g5 li.on {background: #f1c40f;}
+      .g6 li.on {background: #e67e22;}
+      .g7 li.on {background: #e74c3c;}
     </style>
-    <ul class="grids g1">
+    <ul
+      *ngFor="let key of keys"
+      class="grids g{{key}}"
+    >
       <li
-        *ngFor="let grid of grids1; let idx = index"
+        *ngFor="let grid of gridSet[key]; let idx = index"
         class="grid"
         [class.on]="grid.note"
-        (click)="onClickGrid(1, $event, idx)"
+        (click)="onClickGrid(key, $event, idx)"
       ></li>
     </ul>
     
-    <ul class="grids g2">
-      <li
-        *ngFor="let grid of grids2; let idx = index"
-        class="grid"
-        [class.on]="grid.note"
-        (click)="onClickGrid(2, $event, idx)"
-      ></li>
-    </ul>
-    
-    <ul class="grids g3">
-      <li
-        *ngFor="let grid of grids3; let idx = index"
-        class="grid"
-        [class.on]="grid.note"
-        (click)="onClickGrid(3, $event, idx)"
-      ></li>
-    </ul>
-    
-    <ul class="grids g4">
-      <li
-        *ngFor="let grid of grids4; let idx = index"
-        class="grid"
-        [class.on]="grid.note"
-        (click)="onClickGrid(4, $event, idx)"
-      ></li>
-    </ul>
   `
 })
 export class AppComponent {
@@ -99,38 +70,28 @@ export class AppComponent {
     this.midiAdapter = midiAdapter;
 
     this.range = 16;
-    this.grids1 = lodash.range(this.range).map(() => {
-      return {note: false, bpm: DEFAULT_BPM};
-    });
-    this.grids2 = lodash.range(this.range).map(() => {
-      return {note: false, bpm: DEFAULT_BPM};
-    });
-    this.grids3 = lodash.range(this.range).map(() => {
-      return {note: false, bpm: DEFAULT_BPM};
-    });
-    this.grids4 = lodash.range(this.range).map(() => {
-      return {note: false, bpm: DEFAULT_BPM};
-    });
 
-    this.bpmChangeSubject = new Rx.Subject();
-    this.bpmChangeSubject.throttleTime(1000).subscribe((bpm) => {
-      this.run(bpm);
+    this.gridSet = {};
+    lodash.range(8).forEach((i) => {
+      this.gridSet[i] = lodash.range(this.range).map(() => {
+        return {note: false, bpm: DEFAULT_BPM};
+      });
     });
+    this.keys = Object.keys(this.gridSet);
+
+    // Object.keys(this.gridSet).forEach((_, i) => {
+    //   window.firebaseApp.database().ref('grids' + i).set(this.gridSet[i]);
+    // });
   }
 
   ngOnInit() {
-    window.firebaseApp.database().ref('grids1').on('value', (dataSnapshot) => {
-      this.grids1 = dataSnapshot.child('/').val();
+    console.log(this.gridSet);
+    Object.keys(this.gridSet).forEach((_, i) => {
+      window.firebaseApp.database().ref('grids' + i).on('value', (dataSnapshot) => {
+        this.gridSet[i] = dataSnapshot.child('/').val();
+      });
     });
-    window.firebaseApp.database().ref('grids2').on('value', (dataSnapshot) => {
-      this.grids2 = dataSnapshot.child('/').val();
-    });
-    window.firebaseApp.database().ref('grids3').on('value', (dataSnapshot) => {
-      this.grids3 = dataSnapshot.child('/').val();
-    });
-    window.firebaseApp.database().ref('grids4').on('value', (dataSnapshot) => {
-      this.grids4 = dataSnapshot.child('/').val();
-    });
+
     setTimeout(() => {
       this.run(DEFAULT_BPM);
     }, 2000);
@@ -162,22 +123,16 @@ export class AppComponent {
 
         let data = {};
 
-        const current1 = this.f % this.grids1.length;
-        if (this.grids1[current1].note) {
-          data.ch1 = {i: current1, bpm: this.bpm};
-        }
-        const current2 = this.f % this.grids2.length;
-        if (this.grids2[current2].note) {
-          data.ch2 = {i: current2, bpm: this.bpm};
-        }
-        const current3 = this.f % this.grids3.length;
-        if (this.grids3[current3].note) {
-          data.ch3 = {i: current3, bpm: this.bpm};
-        }
-        const current4 = this.f % this.grids4.length;
-        if (this.grids4[current4].note) {
-          data.ch4 = {i: current4, bpm: this.bpm};
-        }
+        const func = (i) => {
+          const current = this.f % this.gridSet[i].length;
+          if (this.gridSet[i][current].note) {
+            data['ch' + i] = {i: current, bpm: this.bpm};
+          }
+        };
+
+        Object.keys(this.gridSet).forEach((_, i) => {
+          func(i);
+        });
 
         if (0 < Object.keys(data).length) {
           this.midiAdapter.emit(data);
@@ -187,11 +142,10 @@ export class AppComponent {
 
   onClickGrid(ch, ev, idx) {
     console.log(`onClickGrid`, idx);
-    this[`grids${ch}`][idx].note = !this[`grids${ch}`][idx].note;
+    this.gridSet[ch][idx].note = !this.gridSet[ch][idx].note;
 
-    window.firebaseApp.database().ref('grids1').set(this.grids1);
-    window.firebaseApp.database().ref('grids2').set(this.grids2);
-    window.firebaseApp.database().ref('grids3').set(this.grids3);
-    window.firebaseApp.database().ref('grids4').set(this.grids4);
+    Object.keys(this.gridSet).forEach((_, i) => {
+      window.firebaseApp.database().ref('grids' + i).set(this.gridSet[i]);
+    });
   }
 }
