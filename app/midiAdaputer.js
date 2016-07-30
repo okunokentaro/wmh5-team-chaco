@@ -71,6 +71,7 @@ class Osc {
         this.vcoParam = v;
         this.lfoParam = l;
         this.vco = this.audioctx.createOscillator();
+        this.vco.type = 'square';
         this.lfo = this.audioctx.createOscillator();
         this.depth = this.audioctx.createGain();
         this.init();
@@ -102,12 +103,12 @@ export class MidiAdaputer {
     constructor (){
         this.midi = new MIDI();
         this.osc = [
-            new Osc(261.626, 100),
-            new Osc(311.127, 100),
-            new Osc(349.228, 100),
-            new Osc(391.995, 100),
-            new Osc(466.164, 100),
-            new Osc(523.251, 100)
+            new Osc(261.626, 1),
+            new Osc(311.127, 1),
+            new Osc(349.228, 1),
+            new Osc(391.995, 1),
+            new Osc(466.164, 1),
+            new Osc(523.251, 1)
         ];
         this.subject = new Rx.Subject();
         this.init();
