@@ -89,7 +89,8 @@ class Osc {
     }
     start(){
         this.vco.frequency.value = this.vcoParam;
-        this.depth.gain.value = 5;
+        this.lfo.frequency.value = this.lfoParam;
+        this.depth.gain.value = 30;
     }
     stop(){
         this.vco.frequency.value = 0;
@@ -101,12 +102,12 @@ export class MidiAdaputer {
     constructor (){
         this.midi = new MIDI();
         this.osc = [
-            new Osc(261.626, 10),
-            new Osc(293.665, 10),
-            new Osc(311.127, 10),
-            new Osc(349.228, 10),
-            new Osc(391.995, 10),
-            new Osc(440, 10)
+            new Osc(261.626, 100),
+            new Osc(311.127, 100),
+            new Osc(349.228, 100),
+            new Osc(391.995, 100),
+            new Osc(466.164, 100),
+            new Osc(523.251, 100)
         ];
         this.subject = new Rx.Subject();
         this.init();
