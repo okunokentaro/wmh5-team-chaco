@@ -34,18 +34,19 @@ const DEFAULT_BPM = 120;
     </ul>
     <input type="range" [ngModel]="bpm" (ngModelChange)="onBpmChange($event)" name="bpm" min="40" max="200">
     <button (click)="contract()">-</button>
-    <button (click)="expand()">+</button>
+  <button (click)="expand()">+</button>
     {{bpm}}
   `
 })
 export class AppComponent {
   constructor(@Inject(FrameService) frame) {
     this.frame = frame;
-
-    this.run(DEFAULT_BPM);
-
     this.range = 16;
     this.grids = lodash.range(this.range);
+  }
+
+  ngOnInit() {
+    this.run(DEFAULT_BPM);
   }
 
   expand() {
