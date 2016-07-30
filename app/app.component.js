@@ -90,10 +90,6 @@ const DEFAULT_BPM = 128;
         (click)="onClickGrid(4, $event, idx)"
       ></li>
     </ul>
-    
-    <button (click)="contract()">-</button>
-    <button (click)="expand()">+</button>
-    {{bpm}}
   `
 })
 export class AppComponent {
@@ -103,6 +99,18 @@ export class AppComponent {
     this.midiAdapter = midiAdapter;
 
     this.range = 16;
+    this.grids1 = lodash.range(this.range).map(() => {
+      return {note: false, bpm: DEFAULT_BPM};
+    });
+    this.grids2 = lodash.range(this.range).map(() => {
+      return {note: false, bpm: DEFAULT_BPM};
+    });
+    this.grids3 = lodash.range(this.range).map(() => {
+      return {note: false, bpm: DEFAULT_BPM};
+    });
+    this.grids4 = lodash.range(this.range).map(() => {
+      return {note: false, bpm: DEFAULT_BPM};
+    });
 
     this.bpmChangeSubject = new Rx.Subject();
     this.bpmChangeSubject.throttleTime(1000).subscribe((bpm) => {
@@ -111,10 +119,6 @@ export class AppComponent {
   }
 
   ngOnInit() {
-    window.firebaseApp.database().ref('grids1').on('value', (dataSnapshot) => {
-      this.grids1 = dataSnapshot.child('/').val();
-    });
-
     window.firebaseApp.database().ref('grids1').on('value', (dataSnapshot) => {
       this.grids1 = dataSnapshot.child('/').val();
     });
@@ -130,23 +134,6 @@ export class AppComponent {
     setTimeout(() => {
       this.run(DEFAULT_BPM);
     }, 2000);
-  }
-
-  expand() {
-    this.range = this.range + 4;
-    this.updateGrid();
-  }
-
-  contract() {
-    this.range = this.range - 4;
-    this.updateGrid();
-  }
-
-  updateGrid() {
-    this.grids1 = lodash.range(this.range);
-    this.grids2 = lodash.range(this.range);
-    this.grids3 = lodash.range(this.range);
-    this.grids4 = lodash.range(this.range);
   }
 
   onBpmChange(bpm) {
