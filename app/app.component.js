@@ -54,10 +54,29 @@ export class AppComponent {
     this.midiAdapter = midiAdapter;
 
     this.range = 16;
-    this.grids = lodash.range(this.range).map((i) => {
-      return {
-        note: false
-      }
+
+    this.initGrid();
+
+    this.bpmChangeSubject = new Rx.Subject();
+    this.bpmChangeSubject.throttleTime(1000).subscribe((bpm) => {
+      this.run(bpm);
+    });
+  }
+
+  ngOnInit() {
+    this.run(DEFAULT_BPM);
+
+    window.firebaseApp.database().ref('grids1').on('value', (dataSnapshot) => {
+      this.grids1 = dataSnapshot.child('/').val();
+    });
+    window.firebaseApp.database().ref('grids2').on('value', (dataSnapshot) => {
+      this.grids2 = dataSnapshot.child('/').val();
+    });
+    window.firebaseApp.database().ref('grids3').on('value', (dataSnapshot) => {
+      this.grids3 = dataSnapshot.child('/').val();
+    });
+    window.firebaseApp.database().ref('grids4').on('value', (dataSnapshot) => {
+      this.grids4 = dataSnapshot.child('/').val();
     });
   }
 
@@ -101,6 +120,11 @@ export class AppComponent {
 
   onClickGrid(ev, idx) {
     console.log(`onClickGrid`, idx);
-    this.grids[idx].note = !this.grids[idx].note;
+    this[`grids${ch}`][idx].note = !this[`grids${ch}`][idx].note;
+
+    window.firebaseApp.database().ref('grids1').set(this.grids1);
+    window.firebaseApp.database().ref('grids2').set(this.grids2);
+    window.firebaseApp.database().ref('grids3').set(this.grids3);
+    window.firebaseApp.database().ref('grids4').set(this.grids4);
   }
 }
