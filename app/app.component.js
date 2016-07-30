@@ -55,7 +55,6 @@ const DEFAULT_BPM = 128;
         background: #a00;
       }
     </style>
-    <h1>{{f}}</h1>
     <ul class="grids g1">
       <li
         *ngFor="let grid of grids1; let idx = index"
@@ -105,8 +104,6 @@ export class AppComponent {
 
     this.range = 16;
 
-    this.initGrid();
-
     this.bpmChangeSubject = new Rx.Subject();
     this.bpmChangeSubject.throttleTime(1000).subscribe((bpm) => {
       this.run(bpm);
@@ -114,9 +111,6 @@ export class AppComponent {
   }
 
   ngOnInit() {
-    this.run(DEFAULT_BPM);
-<<<<<<< HEAD
-
     window.firebaseApp.database().ref('grids1').on('value', (dataSnapshot) => {
       this.grids1 = dataSnapshot.child('/').val();
     });
@@ -128,34 +122,11 @@ export class AppComponent {
     });
     window.firebaseApp.database().ref('grids4').on('value', (dataSnapshot) => {
       this.grids4 = dataSnapshot.child('/').val();
-=======
-  }
-
-  initGrid() {
-    this.grids1 = lodash.range(this.range).map((i) => {
-      return {
-        note: false
-      }
->>>>>>> master
     });
 
-    this.grids2 = lodash.range(this.range).map((i) => {
-      return {
-        note: false
-      }
-    });
-
-    this.grids3 = lodash.range(this.range).map((i) => {
-      return {
-        note: false
-      }
-    });
-
-    this.grids4 = lodash.range(this.range).map((i) => {
-      return {
-        note: false
-      }
-    });
+    setTimeout(() => {
+      this.run(DEFAULT_BPM);
+    }, 2000);
   }
 
   expand() {
