@@ -6,17 +6,17 @@ export class FrameService {
 
   constructor() {
     this.startTime = window.performance.now();
-    this.fps       = 1;
-
-    this.subject = new Subject();
+    this.subject   = new Subject();
   }
 
-  run() {
+  run(bpm) {
+    let fps = 1 / (60 / bpm / 4);
+
     let loop = () => {
       requestAnimationFrame(loop);
       const lastTime = window.performance.now();
       const frame    = ~~(
-        (lastTime - this.startTime) / (1000.0 / this.fps)
+        (lastTime - this.startTime) / (1000.0 / fps)
       ); // Math.floor hack
       this.subject.next(frame);
     };
